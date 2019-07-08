@@ -21,7 +21,7 @@ func('a', 'b', 'c', 'd');
 и выводит в консоль имя (если имени нет, показывать ‘Unknown’) и первые две компании из массива partners:
 */
 
-let getInfo = (data) => {
+const getInfo = (data) => {
     let {
         name,
         info: {
@@ -52,10 +52,9 @@ getInfo(organisation);
 
 // Переделать функцию с использованием функции-стрелки (в методе reduce тоже использовать arrow function):
 
-let sum = (...args) => {
-    const params = Array.prototype.slice.call(args);
-    if (!params.length) return 0;
-    return params.reduce((prev, next) => {
+const sum = (...args) => {
+    if (!args.length) return 0;
+    return args.reduce((prev, next) => {
         return prev + next;
     });
 };
@@ -76,59 +75,55 @@ firstFunc([{age: 45, name: ‘Jhon’}, {age: 20, name: ‘Aaron’}], handler3)
 “New value: Jhon is 45, Aaron is 20,”
 firstFunc([‘abc’, ‘123’], handler4) → “New value: cba, 321,” // строки инвертируются*/
 
-let firstFunc = (data, callback) => {
+const result = (data, callback) => {
     callback(data);
     return `New value: ${callback(data)}`
 };
 
-let handler1 = array => {
-    let arr = [];
-    array.forEach((item, i, array) => {
-        arr.push(array[i].charAt(0).toUpperCase() + array[i].slice(1))
+const joinArray = array => {
+    const arr = [];
+    array.forEach(item => {
+        arr.push(item.charAt(0).toUpperCase() + item.slice(1))
     });
     return arr.join('');
 };
 
-let handler2 = array => {
+const newValue = array => {
     return array.map(x => x * 10).join(', ');
 };
 
-let handler3 = array => {
-    let arr = [];
-    array.forEach((item, i, array) => {
-        arr.push(`${array[i].name} is ${array[i].age}`)
+const userInfo = array => {
+    const arr = [];
+
+    array.forEach(item => {
+        if (item.hasOwnProperty('name') && item.hasOwnProperty('age')) {
+            arr.push(`${item.name} is ${item.age}`)
+        } else {
+            console.log('Не корректный юзер!');
+        }
     });
+    console.log(arr.join(', '));
     return arr.join(', ');
 };
 
-let handler4 = array => {
-    let arr = [];
-    array.forEach((item, i, array) => {
-        arr.push(array[i].split('').reverse().join(''))
+const invertString = array => {
+    const arr = [];
+    array.forEach(item => {
+        arr.push(item.split('').reverse().join(''))
     });
     return arr.join(', ')
 };
 
-console.log(firstFunc(['my', 'name', 'is', 'Trinity'], handler1));
-console.log(firstFunc([10, 20, 30], handler2));
-console.log(firstFunc([{
+result(['my', 'name', 'is', 'Trinity'], joinArray)
+result([10, 20, 30], newValue);
+result([{
     age: 45,
     name: 'Jhon'
 }, {
     age: 20,
     name: 'Aaron'
-}], handler3));
-console.log(firstFunc(['abc', '123'], handler4));
-firstFunc(['abc', '123'], handler4);
-firstFunc([10, 20, 30], handler2);
-firstFunc([{
-    age: 45,
-    name: 'Jhon'
-}, {
-    age: 20,
-    name: 'Aaron'
-}], handler3);
-firstFunc(['abc', '123'], handler4);
+}], userInfo);
+result(['abc', '123'], invertString);
 
 /*------------------------Example 3.2-----------------------*/
 /*
@@ -139,16 +134,20 @@ firstFunc(['abc', '123'], handler4);
 Callback  должен принимать один элемент массива, его индекс в массиве и весь массив.
 */
 
-let every = (arr, callback) => {
-    if (arr instanceof Array && callback instanceof Function) {
-        let el = 2;
-        if (el >= arr.length || el < 0) {
-            alert(`Выбранный Вами элемент ${el}, укажите номер элемента от 0 до ${arr.length - 1}`);
-        } else {
-            return callback(arr[el], arr.indexOf(arr[el]), arr);
+const every = (arr, callback) => {
+    if (Array.isArray(arr) && typeof callback == 'function') {
+        const newArr = []
+        for (let i = 0; i < arr.length; i++) {
+            newArr.push(callback(arr[i], arr.indexOf(arr[i]), arr));
         }
+        for (var i = 0; i < newArr.length - 1; i++) {
+            if (newArr[i] !== newArr[i + 1]) {
+                return false;
+            }
+        }
+        return true;
     } else {
-        if (arr instanceof Array === false) {
+        if (Array.isArray(arr) === false) {
             return alert(`Передаваемый аргумент ${arr} не является массивом`);
         } else {
             return alert(`Передаваемый аргумент ${callback} не является функцией`);
@@ -156,9 +155,9 @@ let every = (arr, callback) => {
     }
 };
 
-let handler = (el, item, arr) => {
+const condition = (el, item, arr) => {
     return el > 5;
 };
 
-console.log(every([1, 12, 25, 30, 44, 48], handler));
-every([1, 12, 25, 30, 44, 48], handler);
+console.log(every([6, 12, 10, 30, 44, 1], condition));
+every([6, 12, 10, 30, 44, 1], condition);
